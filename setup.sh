@@ -5,15 +5,19 @@
 # ------------------------------------
 sudo apt update && sudo apt dist-upgrade -y
 
+mkdir -p ~/Downloads
+cd ~/Downloads
+
+# ------------------------------------
+# enable ssh:
+# ------------------------------------
+sudo apt install openssh-server
 
 # ------------------------------------
 # Install dev tools and some themes:
 # ------------------------------------
 
 sudo apt install -y \
-openjdk-8-jdk-headless \
-maven \
-golang-go \
 python3-minimal \
 build-essential \
 apt-transport-https \
@@ -22,18 +26,58 @@ curl \
 software-properties-common \
 apache2-utils \
 make \
-chromium-browser \
 gnome-tweak-tool \
 python3-pip \
 libgconf-2-4 \
 code \
 arc-theme
 
+# ------------------------------------
+# Tell apt to prefer System76 packages over standard Ubuntu packages
+# ------------------------------------
+echo "adding system76-apt-preferences to local apt repositories"
+
+sudo cat <<-EOF > "/etc/apt/preferences.d/system76-apt-preferences"
+Package: *
+Pin: release o=LP-PPA-system76-dev-stable
+Pin-Priority: 1001
+
+Package: *
+Pin: release o=LP-PPA-system76-dev-pre-stable
+Pin-Priority: 1001
+EOF
+
+# ------------------------------------
+# Install the System76 Display Drivers
+# ------------------------------------
+sudo apt-add-repository -y ppa:system76-dev/stable
+sudo apt-get update
+sudo apt-get install -y system76-driver
+
+# ------------------------------------
+# Install GO
+# ------------------------------------
+wget -O golang.tar.gz https://golang.org/dl/go1.14.6.linux-amd64.tar.gz
+tar -C /usr/local -xzf golang.tar.gz
+echo "export PATH=\$PATH:/usr/local/go/bin" | sudo tee -a /etc/profile 
+echo "export GOROOT=/usr/local/go" | sudo tee -a /etc/profile 
+mkdir -p $HOME/go
+echo "export GOPATH=$HOME/go" >> /home/erik/.zshrc
+go get -u -v -tags v0.16.8 github.com/gobuffalo/buffalo/buffalo@v0.16.8
+
+# ------------------------------------
+# Install DisplayLink Driver
+# ------------------------------------
+sudo apt-get install dkms libdrm-dev
+
+wget -O displaylink-5.2.zip https://www.displaylink.com/downloads/file?id=1576
+unzip displaylink-5.2.zip
+sudo chmod +x displaylink-driver-5.2.14.run
+sudo ./displaylink-driver-5.2.14.run
 
 # ------------------------------------
 # Install NodeJS:
 # ------------------------------------
-
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g npm
@@ -87,7 +131,8 @@ wget https://dl.pstmn.io/download/latest/linux64 -O postman.tar.gz
 sudo tar -xzf postman.tar.gz -C /opt
 sudo ln -s /opt/Postman/Postman /usr/bin/postman
 
-cat > ~/.local/share/applications/postman.desktop <<EOL
+cat > ~/.local/share/ap
+plications/postman.desktop <<EOL
 [Desktop Entry]
 Encoding=UTF-8
 Name=Postman
@@ -97,3 +142,49 @@ Terminal=false
 Type=Application
 Categories=Development;
 EOL
+
+sudo apt-get install zsh
+sudo usermod -s /usr/bin/zsh $(whoami)
+sudo chmod -R 755 /usr/local/share
+sudo apt-get install zsh-syntax-highlighting
+sudo apt-get install powerline10k fonts-powerline
+echo "source /usr/share/powerlevel10k/powerlevel10k.zsh-theme" >> ~/.zshrc
+echo "source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+
+curl https://sh.rustup.rs -sSf | sh -s -- -y
+wget https://github.com/ogham/exa/releases/download/v0.9.0/exa-linux-x86_64-0.9.0.zip -O exa.zip
+unzip exa-linux-x86_64.zip
+sudo mv exa-linux-x86_64 /usr/local/bin/exa
+echo "alias ls='exa -bghHli'" >> /home/erik/.zshrc
+
+# Install terraform as /usr/local/bin exe
+wget https://releases.hashicorp.com/terraform/0.12.29/terraform_0.12.29_linux_amd64.zip -O terraform.zip
+unzip terraform.zip
+sudo mv terraform /usr/local/bin
+
+echo "complete -C '/usr/local/aws/bin/aws_completer' aws"
+
+# Install Tilix, as gnome terminal replacement
+# I've decided to go back to gnome terminal due to 
+# far superior performance.  commenting this tilix 
+# install out for now
+sudo apt-get install tilix
+cat >> ~/.zshrc <<EOL
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte.sh
+fi
+EOL
+ln -s /etc/profile.d/vte-2.91.sh /etc/profile.d/vte.sh
+
+# lenovo throtler fix
+# https://github.com/erpalma/throttled
+# 
+# https://mensfeld.pl/2018/05/lenovo-thinkpad-x1-carbon-6th-gen-2018-ubuntu-18-04-tweaks/
+sudo apt install libdbus-glib-1-dev libgirepository1.0-dev libcairo2-dev python3-venv python3-wheel python-gobject
+git clone https://github.com/erpalma/lenovo-throttling-fix.git
+sudo ./lenovo-throttling-fix/install.sh
+
+https://github.com/erpalma/throttled
+
+# always want this near the end of user_profile
+echo "autoload compinit && compinit" >> /home/erik/.zshrc
