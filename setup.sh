@@ -250,11 +250,15 @@ echo "source /usr/bin/find_pid_cmd" >> ~/.zshrc
 
 PATH=$PATH:~/opt/bin
 
-apparmor apport byobu cloud-guest-utils cloud-init
-  command-not-found ec2-hibinit-agent hibagent
-  landscape-common language-selector-common lsb-release
-  netplan.io networkd-dispatcher nplan open-vm-tools
-  pastebinit plymouth-theme-ubuntu-text snapd software-properties-common sosreport
-  ssh-import-id ubuntu-minimal ubuntu-release-upgrader-core
-  ubuntu-server ubuntu-standard ufw unattended-upgrades
-  update-manager-core update-notifier-common
+# apparmor apport byobu cloud-guest-utils cloud-init
+#   command-not-found ec2-hibinit-agent hibagent
+#   landscape-common language-selector-common lsb-release
+#   netplan.io networkd-dispatcher nplan open-vm-tools
+#   pastebinit plymouth-theme-ubuntu-text snapd software-properties-common sosreport
+#   ssh-import-id ubuntu-minimal ubuntu-release-upgrader-core
+#   ubuntu-server ubuntu-standard ufw unattended-upgrades
+#   update-manager-core update-notifier-common
+
+# install yarn - https://classic.yarnpkg.com/en/docs/install/#debian-stable
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
