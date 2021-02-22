@@ -226,11 +226,11 @@ sudo chmod 755 /usr/bin/synergy.service
 # https://github.com/erpalma/throttled
 # 
 # https://mensfeld.pl/2018/05/lenovo-thinkpad-x1-carbon-6th-gen-2018-ubuntu-18-04-tweaks/
-sudo apt install libdbus-glib-1-dev libgirepository1.0-dev libcairo2-dev python3-venv python3-wheel python-gobject
-git clone https://github.com/erpalma/lenovo-throttling-fix.git
-sudo ./lenovo-throttling-fix/install.sh
+#sudo apt install libdbus-glib-1-dev libgirepository1.0-dev libcairo2-dev python3-venv python3-wheel python-gobject
+#git clone https://github.com/erpalma/lenovo-throttling-fix.git
+#sudo ./lenovo-throttling-fix/install.sh
 
-https://github.com/erpalma/throttled
+#https://github.com/erpalma/throttled
 
 # always want this near the end of user_profile
 echo "autoload compinit && compinit" >> /home/erik/.zshrc
